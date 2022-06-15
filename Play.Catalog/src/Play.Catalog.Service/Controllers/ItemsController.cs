@@ -3,6 +3,8 @@ using Microsoft.VisualBasic;
 using Play.Catalog.Service.Dtos;
 using Play.Catalog.Service.Entities;
 using Play.Common;
+using MassTransit;
+using Play.Catalog.Contracts;
 
 namespace Play.Catalog.Service.Controllers;
 
@@ -16,9 +18,12 @@ public class ItemsController : ControllerBase
   // intanciamos el repositorio de ongo db, con este objeto de la clase
   private readonly IRepository<Item> itemsRepository;
 
-  public ItemsController(IRepository<Item> itemsRepository)
+  private readonly IPublishEndpoint publishEndpoint;
+
+  public ItemsController(IRepository<Item> itemsRepository, IPublishEndpoint publishEndpoint)
   {
     this.itemsRepository = itemsRepository;
+    this.publishEndpoint = publishEndpoint;
   }
 
   //IEnumerable<T> is the base interface for collections in the System.Collections.Generic namespace such as List<T>, Dictionary<TKey,TValue>, and Stack<T> and other generic collections such as ObservableCollection<T> and ConcurrentStack<T>. Collections that implement IEnumerable<T> can be enumerated by using the foreach statement.
@@ -55,8 +60,11 @@ public class ItemsController : ControllerBase
     };
 
     await itemsRepository.CreateAsync(item);
-    //* An ActionResult that returns a Created (201) response with a Location header.
 
+    //* action that will publish the mesage to the mesage broker for async processing
+    await publishEndpoint.Publish(new CatalogItemCreated(item.Id, item.Name, item.Description));
+
+    //* An ActionResult that returns a Created (201) response with a Location header.
     return CreatedAtRoute("NameForGetValueEndpoint", new { id = item.Id }, item);
 
   }
@@ -77,6 +85,10 @@ public class ItemsController : ControllerBase
 
     await itemsRepository.UpdateAsync(existingItem);
 
+
+    //* action that will publish the mesage to the mesage broker for async processing
+    await publishEndpoint.Publish(new CatalogItemUpdated(existingItem.Id, existingItem.Name, existingItem.Description));
+
     return NoContent();
   }
 
@@ -92,6 +104,10 @@ public class ItemsController : ControllerBase
     }
 
     await itemsRepository.RemoveAsync(existingItem.Id);
+
+
+    //* action that will publish the mesage to the mesage broker for async processing
+    await publishEndpoint.Publish(new CatalogItemDeleted(existingItem.Id));
 
     return NoContent();
   }

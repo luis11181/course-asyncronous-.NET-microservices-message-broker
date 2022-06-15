@@ -10,8 +10,21 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongodbdata:/data/db
+      - mongodbdata:/data/db # location to map the volumes we declare bellow
+
+  #* service to start rabbitMQ
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672 # port for rabbitmq services to listen on and publish to
+      - 15672:15672 # port for rabbitmq management portal
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+    hostname: rabbitmq1 # defines how rabbitmq will store data internally, if not specified it will store data everytime in  a different place
 
 #code to define that volume
 volumes:
   mongodbdata:
+  rabbitmqdata:
