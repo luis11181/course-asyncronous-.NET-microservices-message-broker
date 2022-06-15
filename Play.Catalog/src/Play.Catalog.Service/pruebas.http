@@ -1,0 +1,33 @@
+
+###  un comentario es el separador entre requests
+
+
+GET https://localhost:7030/items
+
+###  un comentario es el separador entre requests
+
+
+POST https://localhost:7030/items
+Content-Type: application/json
+
+{
+  "name": "string",
+  "description": "string",
+  "price": 0
+}
+
+###
+
+
+PUT http://localhost:4000/auth/signup
+Content-Type: application/json
+
+{
+ "email": "sdsd@gmail.com",
+  "password": "ssf",
+  "firstName": "f",
+  "lastName": "data.lastName",
+  "role": "data.role"
+}
+
+###
