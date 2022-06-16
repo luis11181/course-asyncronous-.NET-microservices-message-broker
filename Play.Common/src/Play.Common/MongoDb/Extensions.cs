@@ -44,7 +44,7 @@ public static class Extensions
     {
       //sevice.getservice sirve para obtener una instancia de un servicio ya registrado en este caso esa interface corersponde a la de mongodb, cuyo servio se registro en el servicio de mongodb anterior
       var database = ServiceProvider.GetService<IMongoDatabase>();
-      return new MongoRepository<T>(database, "items");
+      return new MongoRepository<T>(database, collectionName);
     });
 
     return services;
